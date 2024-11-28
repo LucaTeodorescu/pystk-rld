@@ -1,0 +1,68 @@
+===============================
+ENV: supertuxkart/full-v0
+The action space is Dict('acceleration': Box(0.0, 1.0, (1,), float32), 'brake': Discrete(2), 'drift': Discrete(2), 'fire': Discrete(2), 'nitro': Discrete(2), 'rescue': Discrete(2), 'steer': Box(-1.0, 1.0, (1,), float32))
+The observation space is Dict('attachment': Discrete(10), 'attachment_time_left': Box(0.0, inf, (1,), float32), 'center_path': Box(-inf, inf, (3,), float32), 'center_path_distance': Box(-inf, inf, (1,), float32), 'distance_down_track': Box(-inf, inf, (1,), float32), 'energy': Box(0.0, inf, (1,), float32), 'front': Box(-inf, inf, (3,), float32), 'items_position': Sequence(Box(-inf, inf, (3,), float32), stack=False), 'items_type': Sequence(Discrete(7), stack=False), 'jumping': Discrete(2), 'karts_position': Sequence(Box(-inf, inf, (3,), float32), stack=False), 'max_steer_angle': Box(-1.0, 1.0, (1,), float32), 'paths_distance': Sequence(Box(0.0, inf, (2,), float32), stack=False), 'paths_end': Sequence(Box(-inf, inf, (3,), float32), stack=False), 'paths_start': Sequence(Box(-inf, inf, (3,), float32), stack=False), 'paths_width': Sequence(Box(0.0, inf, (1,), float32), stack=False), 'powerup': Discrete(11), 'shield_time': Box(0.0, inf, (1,), float32), 'skeed_factor': Box(0.0, inf, (1,), float32), 'velocity': Box(-inf, inf, (3,), float32))
+===============================
+ENV: supertuxkart/simple-v0
+The action space is Dict('acceleration': Box(0.0, 1.0, (1,), float32), 'brake': Discrete(2), 'drift': Discrete(2), 'fire': Discrete(2), 'nitro': Discrete(2), 'rescue': Discrete(2), 'steer': Box(-1.0, 1.0, (1,), float32))
+The observation space is Dict('attachment': Discrete(10), 'attachment_time_left': Box(0.0, inf, (1,), float32), 'center_path': Box(-inf, inf, (3,), float32), 'center_path_distance': Box(-inf, inf, (1,), float32), 'distance_down_track': Box(-inf, inf, (1,), float32), 'energy': Box(0.0, inf, (1,), float32), 'front': Box(-inf, inf, (3,), float32), 'items_position': Box(-inf, inf, (5, 3), float32), 'items_type': MultiDiscrete([7 7 7 7 7]), 'jumping': Discrete(2), 'karts_position': Box(-inf, inf, (5, 3), float32), 'max_steer_angle': Box(-1.0, 1.0, (1,), float32), 'paths_distance': Box(0.0, inf, (5, 2), float32), 'paths_end': Box(-inf, inf, (5, 3), float32), 'paths_start': Box(-inf, inf, (5, 3), float32), 'paths_width': Box(0.0, inf, (5, 1), float32), 'powerup': Discrete(11), 'shield_time': Box(0.0, inf, (1,), float32), 'skeed_factor': Box(0.0, inf, (1,), float32), 'velocity': Box(-inf, inf, (3,), float32))
+===============================
+ENV: supertuxkart/flattened-v0
+The action space is Dict('continuous': Box([ 0. -1.], 1.0, (2,), float32), 'discrete': MultiDiscrete([2 2 2 2 2]))
+The observation space is Dict('continuous': Box([  0. -inf -inf -inf -inf -inf   0. -inf -inf -inf -inf -inf -inf -inf
+ -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+ -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf  -1.   0.
+   0.   0.   0.   0.   0.   0.   0.   0.   0. -inf -inf -inf -inf -inf
+ -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+ -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf   0.   0.   0.
+   0.   0.   0.   0. -inf -inf -inf], [inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+ inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+ inf inf inf inf  1. inf inf inf inf inf inf inf inf inf inf inf inf inf
+ inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+ inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+ inf], (91,), float32), 'discrete': MultiDiscrete([10  7  7  7  7  7  2 11]))
+===============================
+ENV: supertuxkart/flattened_continuous_actions-v0
+The action space is Box([ 0. -1.], 1.0, (2,), float32)
+The observation space is Dict('continuous': Box([  0. -inf -inf -inf -inf -inf   0. -inf -inf -inf -inf -inf -inf -inf
+ -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+ -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf  -1.   0.
+   0.   0.   0.   0.   0.   0.   0.   0.   0. -inf -inf -inf -inf -inf
+ -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+ -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf   0.   0.   0.
+   0.   0.   0.   0. -inf -inf -inf], [inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+ inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+ inf inf inf inf  1. inf inf inf inf inf inf inf inf inf inf inf inf inf
+ inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+ inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+ inf], (91,), float32), 'discrete': MultiDiscrete([10  7  7  7  7  7  2 11]))
+===============================
+ENV: supertuxkart/flattened_multidiscrete-v0
+The action space is MultiDiscrete([5 2 2 2 2 2 7])
+The observation space is Dict('continuous': Box([  0. -inf -inf -inf -inf -inf   0. -inf -inf -inf -inf -inf -inf -inf
+ -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+ -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf  -1.   0.
+   0.   0.   0.   0.   0.   0.   0.   0.   0. -inf -inf -inf -inf -inf
+ -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+ -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf   0.   0.   0.
+   0.   0.   0.   0. -inf -inf -inf], [inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+ inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+ inf inf inf inf  1. inf inf inf inf inf inf inf inf inf inf inf inf inf
+ inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+ inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+ inf], (91,), float32), 'discrete': MultiDiscrete([10  7  7  7  7  7  2 11]))
+===============================
+ENV: supertuxkart/flattened_discrete-v0
+The action space is Discrete(1120)
+The observation space is Dict('continuous': Box([  0. -inf -inf -inf -inf -inf   0. -inf -inf -inf -inf -inf -inf -inf
+ -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+ -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf  -1.   0.
+   0.   0.   0.   0.   0.   0.   0.   0.   0. -inf -inf -inf -inf -inf
+ -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+ -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf   0.   0.   0.
+   0.   0.   0.   0. -inf -inf -inf], [inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+ inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+ inf inf inf inf  1. inf inf inf inf inf inf inf inf inf inf inf inf inf
+ inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+ inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+ inf], (91,), float32), 'discrete': MultiDiscrete([10  7  7  7  7  7  2 11]))
