@@ -10,7 +10,7 @@ from .actors import Actor, MyWrapper, ArgmaxActor, SamplingActor
 env_name = "supertuxkart/flattened_multidiscrete-v0"
 
 #: Player name
-player_name = "Example"
+player_name = "Luca"
 
 
 def get_actor(

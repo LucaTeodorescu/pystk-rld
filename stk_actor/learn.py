@@ -27,7 +27,7 @@ if __name__ == "__main__":
     # (2) Learn
 
     actor = Actor(env.observation_space, env.action_space)
-    ...
+
 
     # (3) Save the actor sate
     mod_path = Path(inspect.getfile(get_wrappers)).parent
