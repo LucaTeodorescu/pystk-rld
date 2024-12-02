@@ -25,7 +25,8 @@ class DiscreteQAgent(Agent):
         """An Agent can use self.workspace"""
 
         # Retrieves the observation from the environment at time t
-        obs = self.get(("env/env_obs", t))
+        obs = self.get(("env/env_obs/discrete", t))
+        print(obs)
 
         # Computes the critic (Q) values for the observation
         q_values = self.model(obs)
@@ -114,18 +115,16 @@ def compute_critic_loss(
 
     critic_loss = td_error.pow(2).mean()
 
-    return critic_loss        
+    return critic_loss
 
         
 class EpisodicDQN(EpisodicAlgo):
     def __init__(self, cfg):
         super().__init__(cfg)
         
-        print(self.train_env.action_space)
-        print(self.train_env.action_space.shape)
-        self.train_env.observation_space = 
+        # For the "supertuxkart/flattened_multidiscrete-v0" env, select only the discrete obs
+        self.train_env.observation_space = self.train_env.observation_space["discrete"]
         print(self.train_env.observation_space)
-        print(self.train_env.observation_space.shape)
 
         # Get the observation / action state space dimensions
         obs_size, act_size = self.train_env.get_obs_and_actions_sizes()
@@ -195,7 +194,7 @@ if __name__ == "__main__":
         "n_envs": 8,
         "eval_interval": 5_000,
         "max_epochs": 500,
-        "nb_evals": 10,
+        "nb_evals": 1,
         "discount_factor": 0.99,
         "architecture": {"hidden_size": [256, 256]},
     },
