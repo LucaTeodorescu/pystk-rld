@@ -62,3 +62,40 @@ To test your agent directly (for debug purposes), you can also use
 ```sh
 PYTHONPATH=. master-dac rld stk-race --hide stk_actor
 ```
+
+# Pystk2-Gymnasium Environment description
+
+Main environment is `supertuxkart/full-v0` containing all the observations.
+
+## `action_space`:
+
+- `acceleration`: `Box(0.0, 1.0, (1,), float32)`
+- `brake`: `Discrete(2)`
+- `drift`: `Discrete(2)`
+- `fire`: `Discrete(2)`
+- `nitro`: `Discrete(2)`
+- `rescue`: `Discrete(2)`
+- `steer`: `Box(-1.0, 1.0, (1,), float32)`
+
+## `observation_space`:
+
+- `attachment`: `Discrete(10)`
+- `attachment_time_left`: `Box(0.0, inf, (1,), float32)`
+- `center_path`: `Box(-inf, inf, (3,), float32)`
+- `center_path_distance`: `Box(-inf, inf, (1,), float32)`
+- `distance_down_track`: `Box(-inf, inf, (1,), float32)`
+- `energy`: `Box(0.0, inf, (1,), float32)`
+- `front`: `Box(-inf, inf, (3,), float32)`
+- `items_position`: `Sequence(Box(-inf, inf, (3,), float32), stack=False)`
+- `items_type`: `Sequence(Discrete(7), stack=False)`
+- `jumping`: `Discrete(2)`
+- `karts_position`: `Sequence(Box(-inf, inf, (3,), float32), stack=False)`
+- `max_steer_angle`: `Box(-1.0, 1.0, (1,), float32)`
+- `paths_distance`: `Sequence(Box(0.0, inf, (2,), float32), stack=False)`
+- `paths_end`: `Sequence(Box(-inf, inf, (3,), float32), stack=False)`
+- `paths_start`: `Sequence(Box(-inf, inf, (3,), float32), stack=False)`
+- `paths_width`: `Sequence(Box(0.0, inf, (1,), float32), stack=False)`
+- `powerup`: `Discrete(11)`
+- `shield_time`: `Box(0.0, inf, (1,), float32)`
+- `skeed_factor`: `Box(0.0, inf, (1,), float32)`
+- `velocity`: `Box(-inf, inf, (3,), float32)`
