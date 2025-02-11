@@ -1,14 +1,12 @@
-import gymnasium as gym
-from bbrl.agents import Agent
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from collections import deque
+from bbrl.agents import Agent
 import random
 from typing import Dict, List, Tuple
-
-
+    
 class Actor(nn.Module):
     def __init__(self, continuous_dim: int, discrete_dim: int, action_dim: int = 2, hidden_dim: int = 256):
         """
@@ -159,6 +157,21 @@ class DDPGAgent:
         self.gamma = gamma
         self.tau = tau
         self.action_noise = action_noise
+    
+    def load_state_dict(self, checkpoint):
+        # Load actor and critic networks
+        self.actor.load_state_dict(checkpoint['actor_state_dict'])
+        self.actor_target.load_state_dict(checkpoint['actor_target_state_dict'])
+        self.critic.load_state_dict(checkpoint['critic_state_dict'])
+        self.critic_target.load_state_dict(checkpoint['critic_target_state_dict'])
+        
+        # Load optimizers
+        self.actor_optimizer.load_state_dict(checkpoint['actor_optimizer_state_dict'])
+        self.critic_optimizer.load_state_dict(checkpoint['critic_optimizer_state_dict'])
+
+    def eval(self):
+        self.actor.eval()
+        self.actor_target.eval()
         
     def select_action(self, state: Dict[str, np.ndarray]) -> np.ndarray:
         with torch.no_grad():
@@ -219,21 +232,30 @@ class DDPGAgent:
             target_param.data.copy_(self.tau * param.data + (1 - self.tau) * target_param.data)
         
         return actor_loss.item(), critic_loss.item()
-    
-class ArgmaxActor(Agent):
-    """Actor that computes the action"""
 
-    def forward(self, t: int):
-        # Selects the best actions according to the policy
-        pass
-
-
-class SamplingActor(Agent):
-    """Samples random actions"""
-
-    def __init__(self, action_space: gym.Space):
+class DDPGAgentWrapper(Agent):
+    def __init__(self, ddpg_agent):
         super().__init__()
-        self.action_space = action_space
+        self.ddpg_agent = ddpg_agent
 
-    def forward(self, t: int):
-        self.set(("action", t), torch.LongTensor([self.action_space.sample()]))
+    def __call__(self, workspace, t=0, **kwargs):
+        self.forward(workspace, t=t, **kwargs)
+
+    def forward(self, workspace, t=0, **kwargs):
+        """Reads observation from the workspace, uses ddpg_agent to select action."""
+        continuous_obs = workspace.get('env/env_obs/continuous', t)
+        discrete_obs   = workspace.get('env/env_obs/discrete', t)
+
+        actions = []
+        batch_size = continuous_obs.shape[0]
+
+        for i in range(batch_size):
+            state_dict = {
+                'continuous': continuous_obs[i].cpu().numpy(),
+                'discrete':   discrete_obs[i].cpu().numpy(),
+            }
+            
+            act = self.ddpg_agent.select_action(state_dict)
+            actions.append(act)
+        actions = torch.tensor(actions, dtype=torch.float32, device=continuous_obs.device)
+        workspace.set('action', t, actions)
