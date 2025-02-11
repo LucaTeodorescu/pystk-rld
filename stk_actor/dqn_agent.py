@@ -6,15 +6,15 @@ from collections import deque
 import random
 from typing import Dict, List, Tuple
 
-class MultiDiscreteDQN(nn.Module):
-    def __init__(self, continuous_dim: int, discrete_dim: int, action_dims: List[int], hidden_dim: int = 256):
+class SingleDiscreteDQN(nn.Module):
+    def __init__(self, continuous_dim: int, discrete_dim: int, action_dim: int, hidden_dim: int = 256):
         """
-        MultiDiscreteDQN network that handles both continuous and discrete observations
+        Modified DQN network for a single discrete action space
         
         Args:
             continuous_dim: dimension of continuous observations
             discrete_dim: dimension of discrete observations
-            action_dims: list of dimensions for each discrete action
+            action_dim: dimension of the single discrete action space (1120 in your case)
             hidden_dim: dimension of hidden layers
         """
         super().__init__()
@@ -28,9 +28,9 @@ class MultiDiscreteDQN(nn.Module):
         )
         
         # Process discrete observations
-        self.discrete_embedding = nn.Embedding(50, 8)  # Embedding for discrete values (max 50 values)
+        self.discrete_embedding = nn.Embedding(50, 8)  # Embedding for discrete values
         self.discrete_net = nn.Sequential(
-            nn.Linear(discrete_dim * 8, hidden_dim),  # 8 is embedding dim
+            nn.Linear(discrete_dim * 8, hidden_dim),
             nn.ReLU(),
             nn.Linear(hidden_dim, hidden_dim),
             nn.ReLU()
@@ -42,26 +42,15 @@ class MultiDiscreteDQN(nn.Module):
             nn.ReLU()
         )
         
-        # Separate output heads for each action dimension
-        self.action_heads = nn.ModuleList([
-            nn.Linear(hidden_dim, dim) for dim in action_dims
-        ])
-        
-        self.action_dims = action_dims
+        # Single output head for the entire action space
+        self.action_head = nn.Linear(hidden_dim, action_dim)
     
-    def forward(self, continuous_obs: torch.Tensor, discrete_obs: torch.Tensor) -> List[torch.Tensor]:
-        # Process continuous observations
+    def forward(self, continuous_obs: torch.Tensor, discrete_obs: torch.Tensor) -> torch.Tensor:
         continuous_features = self.continuous_net(continuous_obs)
-        
-        # Process discrete observations
         discrete_embedded = self.discrete_embedding(discrete_obs)
         discrete_features = self.discrete_net(discrete_embedded.view(discrete_embedded.size(0), -1))
-        
-        # Combine features
         combined = self.combine_net(torch.cat([continuous_features, discrete_features], dim=1))
-        
-        # Get Q-values for each action dimension
-        return [head(combined) for head in self.action_heads]
+        return self.action_head(combined)
 
 class ReplayBuffer:
     def __init__(self, capacity: int):
@@ -93,7 +82,7 @@ class ReplayBuffer:
         return len(self.buffer)
 
 class STKAgent:
-    def __init__(self, continuous_dim: int, discrete_dim: int, action_dims: List[int],
+    def __init__(self, continuous_dim: int, discrete_dim: int, action_dim: int,
                  learning_rate: float = 1e-4, gamma: float = 0.99,
                  epsilon_start: float = 1.0, epsilon_end: float = 0.01,
                  epsilon_decay: float = 0.995, buffer_size: int = 100000,
@@ -101,9 +90,9 @@ class STKAgent:
         
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         
-        # Create Q networks
-        self.q_net = MultiDiscreteDQN(continuous_dim, discrete_dim, action_dims).to(self.device)
-        self.target_net = MultiDiscreteDQN(continuous_dim, discrete_dim, action_dims).to(self.device)
+        # Create Q networks for single discrete action space
+        self.q_net = SingleDiscreteDQN(continuous_dim, discrete_dim, action_dim).to(self.device)
+        self.target_net = SingleDiscreteDQN(continuous_dim, discrete_dim, action_dim).to(self.device)
         self.target_net.load_state_dict(self.q_net.state_dict())
         
         self.optimizer = torch.optim.Adam(self.q_net.parameters(), lr=learning_rate)
@@ -115,22 +104,22 @@ class STKAgent:
         self.epsilon_end = epsilon_end
         self.epsilon_decay = epsilon_decay
         self.target_update = target_update
-        self.action_dims = action_dims
+        self.action_dim = action_dim
         
         self.total_steps = 0
     
-    def select_action(self, state: Dict[str, np.ndarray]) -> np.ndarray:
+    def select_action(self, state: Dict[str, np.ndarray]) -> int:
         if random.random() < self.epsilon:
-            return np.array([random.randint(0, dim-1) for dim in self.action_dims])
+            return random.randint(0, self.action_dim - 1)
         
         with torch.no_grad():
             continuous = torch.FloatTensor(state['continuous']).unsqueeze(0).to(self.device)
             discrete = torch.LongTensor(state['discrete']).unsqueeze(0).to(self.device)
             
             q_values = self.q_net(continuous, discrete)
-            actions = [q.argmax(1).item() for q in q_values]
+            action = q_values.argmax(1).item()
             
-        return np.array(actions)
+        return action
     
     def update(self) -> float:
         if len(self.memory) < self.batch_size:
@@ -148,18 +137,16 @@ class STKAgent:
         
         # Get current Q values
         current_q_values = self.q_net(states['continuous'], states['discrete'])
+        q_value = current_q_values.gather(1, actions.unsqueeze(1)).squeeze(1)
         
         # Get next Q values
         with torch.no_grad():
             next_q_values = self.target_net(next_states['continuous'], next_states['discrete'])
-            next_q_values = [q.max(1)[0] for q in next_q_values]
+            next_q_value = next_q_values.max(1)[0]
+            expected_q_value = rewards + (1 - dones) * self.gamma * next_q_value
         
-        # Compute loss for each action dimension
-        loss = 0
-        for i, (q_values, next_q) in enumerate(zip(current_q_values, next_q_values)):
-            q_value = q_values.gather(1, actions[:, i].unsqueeze(1)).squeeze(1)
-            expected_q_value = rewards + (1 - dones) * self.gamma * next_q
-            loss += F.smooth_l1_loss(q_value, expected_q_value)
+        # Compute loss
+        loss = F.smooth_l1_loss(q_value, expected_q_value)
         
         # Optimize
         self.optimizer.zero_grad()

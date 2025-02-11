@@ -17,24 +17,29 @@ def try_env_reset(env):
         print(f"Reset failed: {str(e)}")
         return None
 
-def train(num_episodes=100, max_steps=5000):
+def train(num_episodes=100, max_steps=3000):
     # Create initial environment
     env = gym.make(
-        "supertuxkart/flattened_multidiscrete-v0",
-        render_mode=None,                        # None or "human"
+        "supertuxkart/flattened_discrete-v0",
+        render_mode="human",                        # None or "human"
         agent=AgentSpec(use_ai=False, name="DQNAgent")
     )
     
     # Get environment specs for agent creation
+    print("observation_space:", env.observation_space)
+    print("action_space:", env.action_space)
     continuous_dim = env.observation_space['continuous'].shape[0]
     discrete_dim = len(env.observation_space['discrete'].nvec)
-    action_dims = list(env.action_space.nvec)
+    action_dim = env.action_space.n
+    print(f"Continuous dim: {continuous_dim}")
+    print(f"Discrete dim: {discrete_dim}")
+    print(f"Action dims: {action_dim}")
     
     # Create agent
     agent = STKAgent(
         continuous_dim=continuous_dim,
         discrete_dim=discrete_dim,
-        action_dims=action_dims,
+        action_dim=action_dim,
         learning_rate=3e-4,
         gamma=0.99,
         epsilon_start=1.0,
@@ -70,7 +75,7 @@ def train(num_episodes=100, max_steps=5000):
                 except:
                     pass
                 env = gym.make(
-                    "supertuxkart/flattened_multidiscrete-v0",
+                    "supertuxkart/flattened_discrete-v0",
                     render_mode=None,
                     agent=AgentSpec(use_ai=False, name="DQNAgent")
                 )
