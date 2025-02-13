@@ -25,7 +25,6 @@ def get_actor(state, observation_space, action_space) -> Agent:
     
     env = DummyVecEnv([make_env()])
     model = PPO("MultiInputPolicy", env, verbose=1)
-    print(state)
     
     model.policy.load_state_dict(state)
     ppo_agent = PPOAgentWrapper(model, device=model.device)
