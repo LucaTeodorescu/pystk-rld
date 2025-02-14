@@ -7,7 +7,7 @@ import json
 import signal
 import sys
 
-from ddpg_agent import DDPGAgent
+from stk_actor.ppo_agent import DDPGAgent
 
 def try_env_reset(env):
     """Attempt to reset environment, return None if failed"""
