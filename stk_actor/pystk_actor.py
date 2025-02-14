@@ -15,7 +15,8 @@ def make_env(mode=None):
     def _init():
         env = gym.make("supertuxkart/full-v0",
                       render_mode=mode, 
-                      agent=AgentSpec(use_ai=False))
+                      agent=AgentSpec(use_ai=False),
+                      max_paths=5)
         # If you have wrappers, apply them here
         env = DiscreteLimitedWrapper(env)
         return env

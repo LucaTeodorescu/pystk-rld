@@ -32,7 +32,7 @@ class DiscreteLimitedWrapper(ActionObservationWrapper):
         self.action_space = spaces.MultiDiscrete([
             len(self.steering_values),    # 5 steering values
             len(self.acceleration_values), # 3 acceleration values
-            len(self.brake_values),               # 2 brake values
+            len(self.brake_values)         # 2 brake values
         ])
         
         # Store original action space for reference
@@ -86,13 +86,13 @@ class DiscreteLimitedWrapper(ActionObservationWrapper):
         self.velocity_history[-1] = current_speed
 
     def action(self, action):
-        steer_idx, accel_idx, brake_id = action
+        steer_idx, accel_idx, brake_idx = action
         
         # Create full action dictionary with default values
         full_action = {
             'steer': np.array([self.steering_values[steer_idx]], dtype=np.float32),
             'acceleration': np.array([self.acceleration_values[accel_idx]], dtype=np.float32),
-            'brake': np.array(self.brake_values[brake_id], dtype=np.float32),
+            'brake': np.array([self.brake_values[brake_idx]], dtype=np.float32),
             'drift': 0,      # Default: no drift
             'fire': 0,       # Default: no fire
             'nitro': 0,      # Default: no nitro
