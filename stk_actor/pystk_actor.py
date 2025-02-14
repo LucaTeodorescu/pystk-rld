@@ -9,7 +9,7 @@ from stable_baselines3.common.vec_env import DummyVecEnv
 
 from .actors import PPOAgentWrapper, DiscreteLimitedWrapper  # Import the actor from the other file
 env_name = "supertuxkart/full-v0"
-player_name = "SlippyGuin-PPO_Discrete2D"
+player_name = "SlippyGuin-PPO-Limited"
 
 def make_env(mode=None):
     def _init():
